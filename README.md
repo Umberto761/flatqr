@@ -61,7 +61,7 @@ Vor dem Versand an Kunden: IBAN unter *Einstellungen* ersetzen und das PDF mit e
 
 Kein Magic-Link-Mailer, kein Polar-Entitlement. `BETA_ACCESS` (Default `flatqr-beta`) plus E-Mail setzt ein Session-Cookie. Polar Agency Flat / Solo bleibt Stub.
 
-Marketing (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch.surge.sh).
+Marketing-Seite (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch.surge.sh).
 
 ## Deploy (Budget 0)
 
