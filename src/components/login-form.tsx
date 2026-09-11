@@ -1,76 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useActionState } from "react";
+import { loginAction } from "@/app/actions";
 
 export function LoginForm({ nextPath = "/app" }: { nextPath?: string }) {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const [state, action, pending] = useActionState(loginAction, null);
 
   return (
-    <form
-      className="space-y-4"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setPending(true);
-        setError(null);
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, code }),
-        });
-        const payload = (await response.json()) as { error?: string };
-        setPending(false);
-        if (!response.ok) {
-          setError(payload.error ?? "Login fehlgeschlagen.");
-          return;
-        }
-        router.push(nextPath);
-        router.refresh();
-      }}
-    >
+    <form action={action} className="space-y-4">
+      <input type="hidden" name="next" value={nextPath} />
       <div className="space-y-1.5">
-        <Label htmlFor="email">E-Mail</Label>
-        <Input
+        <label htmlFor="email" className="text-sm font-medium">
+          E-Mail
+        </label>
+        <input
           id="email"
+          name="email"
           type="email"
           autoComplete="email"
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           placeholder="du@atelier.ch"
+          className="h-11 w-full border border-[#c5c9d0] bg-white px-3 text-sm outline-none focus:border-[#0d1b2a]"
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="code">Beta-Code</Label>
-        <Input
+        <label htmlFor="code" className="text-sm font-medium">
+          Beta-Code
+        </label>
+        <input
           id="code"
+          name="code"
           type="password"
           autoComplete="off"
           required
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
           placeholder="BETA_ACCESS"
+          className="h-11 w-full border border-[#c5c9d0] bg-white px-3 text-sm outline-none focus:border-[#0d1b2a]"
         />
         <p className="text-xs text-muted-foreground">
           Polar-Checkout ist noch nicht angebunden. Lokal gilt der Code aus{" "}
           <code>BETA_ACCESS</code> (Standard: <code>flatqr-beta</code>).
         </p>
       </div>
-      {error ? (
+      {state?.error ? (
         <p className="text-sm text-destructive" role="alert">
-          {error}
+          {state.error}
         </p>
       ) : null}
-      <Button type="submit" disabled={pending} className="w-full bg-black text-white">
+      <button
+        type="submit"
+        disabled={pending}
+        className="h-11 w-full bg-black text-sm font-medium text-white disabled:opacity-50"
+      >
         {pending ? "Prüfen…" : "In die Werkstatt"}
-      </Button>
+      </button>
     </form>
   );
 }
