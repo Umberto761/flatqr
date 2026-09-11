@@ -1,3 +1,13 @@
+---
+title: FlatQR
+emoji: 🧾
+colorFrom: gray
+colorTo: red
+sdk: docker
+app_port: 43127
+pinned: false
+---
+
 # FlatQR
 
 Harvest-CSV → Timesheet prüfen → **deutsche Swiss QR-Rechnung** (Empfangsschein + Zahlteil) mit CH-MwSt. Kein ERP.
@@ -67,10 +77,15 @@ Marketing-Seite (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch
 
 Kernpfad braucht keine bezahlten APIs. Speicher ist lokal SQLite.
 
-**Render Free** (`render.yaml`): Web Service, Plan *Free*, Frankfurt. `BETA_ACCESS=flatqr-beta` is already in the blueprint.  
-Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/flatqr). Free instances **cannot** attach a persistent disk — SQLite in `data/` is wiped when the service sleeps (15 min idle) or redeploys. Demo-CSV → QR-PDF still works after each cold start. For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
+Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/flatqr).
+
+**Hugging Face Spaces (Docker, no card):** this repo is a Docker Space (`sdk: docker`, port 43127). Free CPU sleeps after idle; SQLite in `data/` is wiped on restart. `BETA_ACCESS=flatqr-beta`. Demo-CSV → QR-PDF still works after each cold start.
+
+**Render Free** (`render.yaml`): new accounts now hit an **Add Card** wall ($1 authorization) even for the Free instance. Do not add a card if the rule is zero spend.
 
 **Fly.io:** `Dockerfile` is ready, but new Fly orgs only get a short unpaid trial (then a card). Do not use Fly if the rule is zero spend.
+
+For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
 
 ```bash
 npm run build
