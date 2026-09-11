@@ -1,0 +1,11 @@
+Date,Client,Project,Project Code,Task,Notes,Hours,Billable?,First Name,Last Name,Billable Rate,Billable Amount,Currency
+2026-08-04,Atelier Nord GmbH,Website Relaunch,AN-WEB,Development,App Router und CSV-Import,6.50,Yes,Joel,Baumann,160.00,1040.00,CHF
+2026-08-05,Atelier Nord GmbH,Website Relaunch,AN-WEB,Development,Timesheet-Tabelle und MwSt-Sätze,5.25,Yes,Joel,Baumann,160.00,840.00,CHF
+2026-08-06,Atelier Nord GmbH,Website Relaunch,AN-WEB,Design,Satzspiegel Rechnung,2.00,Yes,Joel,Baumann,140.00,280.00,CHF
+2026-08-11,Atelier Nord GmbH,Website Relaunch,AN-WEB,Development,QR-Bill Empfangsschein + Zahlteil,4.00,Yes,Joel,Baumann,160.00,640.00,CHF
+2026-08-12,Kantonsspital Muster,Intranet Search,KSM-IN,Research,Kickoff und Bestandsaufnahme,3.00,Yes,Joel,Baumann,180.00,540.00,CHF
+2026-08-13,Kantonsspital Muster,Intranet Search,KSM-IN,Development,Index und Filter,7.50,Yes,Joel,Baumann,180.00,1350.00,CHF
+2026-08-18,Kantonsspital Muster,Intranet Search,KSM-IN,Meeting,Zwischenstand mit Informatik,1.50,Yes,Joel,Baumann,180.00,270.00,CHF
+2026-08-19,Buchhandlung Clarahof,Ladenfenster Saison,CL-WIN,Print,Satz Plakate (reduzierter Satz),3.00,Yes,Joel,Baumann,120.00,360.00,CHF
+2026-08-20,Atelier Nord GmbH,Interne Ablage,AN-OPS,Admin,Dateiordnung,1.00,No,Joel,Baumann,0.00,0.00,CHF
+2026-08-25,Atelier Nord GmbH,Website Relaunch,AN-WEB,QA,Abnahme Staging,2.75,Yes,Joel,Baumann,160.00,440.00,CHF
