@@ -1,15 +1,21 @@
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { LoginForm } from "@/components/login-form";
 import { currentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
-  const user = await currentUser();
-  if (user) redirect("/app");
+  // Never redirect `/` → `/app`. Behind SnapDeploy TLS that pair 302-looped
+  // and failed the container health check. Logged-in users get a link instead.
+  let user: string | null = null;
+  try {
+    user = await currentUser();
+  } catch {
+    user = null;
+  }
   const params = await searchParams;
 
   return (
@@ -42,7 +48,16 @@ export default async function Home({
         </section>
         <section className="border border-[#c5c9d0] bg-white p-5">
           <h2 className="mb-3 text-base font-semibold">Beta-Zugang</h2>
-          <LoginForm nextPath={params.next || "/app"} />
+          {user ? (
+            <p className="text-sm leading-6">
+              Angemeldet als {user}.{" "}
+              <Link href="/app" className="underline underline-offset-2">
+                Zur Werkstatt
+              </Link>
+            </p>
+          ) : (
+            <LoginForm nextPath={params.next || "/app"} />
+          )}
         </section>
       </div>
     </AppShell>

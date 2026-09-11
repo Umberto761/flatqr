@@ -23,7 +23,8 @@ export async function login(email: string, code: string): Promise<void> {
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // SnapDeploy terminates TLS in front of HTTP. Public URL is HTTPS.
+    secure: process.env.NODE_ENV === "production" && process.env.COOKIE_INSECURE !== "1",
     path: "/",
     maxAge: 30 * 24 * 60 * 60,
   });

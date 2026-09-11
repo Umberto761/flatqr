@@ -4,7 +4,7 @@ emoji: 🧾
 colorFrom: gray
 colorTo: red
 sdk: docker
-app_port: 43127
+app_port: 8080
 pinned: false
 ---
 
@@ -77,19 +77,31 @@ Marketing-Seite (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch
 
 Kernpfad braucht keine bezahlten APIs. Speicher ist lokal SQLite.
 
-Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/flatqr).
+Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/flatqr). Joel’s SnapDeploy copy: [github.com/Umberto761/flatqr](https://github.com/Umberto761/flatqr).
 
-**Hugging Face Spaces (Docker, no card):** this repo is a Docker Space (`sdk: docker`, port 43127). Free CPU sleeps after idle; SQLite in `data/` is wiped on restart. `BETA_ACCESS=flatqr-beta`. Demo-CSV → QR-PDF still works after each cold start.
+**SnapDeploy / Docker (no card):**
 
-**Render Free** (`render.yaml`): new accounts now hit an **Add Card** wall ($1 authorization) even for the Free instance. Do not add a card if the rule is zero spend.
+| | |
+| --- | --- |
+| Build | `npm ci && npm run build` (or the repo `Dockerfile`) |
+| Start | `npm start` → `node scripts/start.cjs` (standalone `server.js` if present) |
+| Bind | `0.0.0.0` and `process.env.PORT` (default **8080** in containers; local `next dev` stays 43127) |
+| Health | `GET /health` → `200 ok` (no auth, no DB). `GET /` is the login page and must not redirect. |
+| Env | **`BETA_ACCESS=flatqr-beta`** (required), `NODE_ENV=production`. Optional: `HOSTNAME=0.0.0.0` if the platform does not set it. |
 
-**Fly.io:** `Dockerfile` is ready, but new Fly orgs only get a short unpaid trial (then a card). Do not use Fly if the rule is zero spend.
+Set the SnapDeploy health path to `/health`. Free SnapDeploy accounts cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
+
+**Hugging Face Spaces (Docker):** `sdk: docker`, `app_port: 8080`. New accounts now require PRO for Docker Spaces.
+
+**Render Free** (`render.yaml`): new accounts hit an **Add Card** wall even for Free. Do not add a card if the rule is zero spend.
+
+**Fly.io:** short unpaid trial, then a card. Do not use Fly if the rule is zero spend.
 
 For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
 
 ```bash
 npm run build
-PORT=43127 npm start
+PORT=8080 npm start
 ```
 
 ## Tests

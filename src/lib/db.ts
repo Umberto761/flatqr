@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { createClient, type Client, type InValue } from "@libsql/client";
 import { SAMPLE_QR_IBAN } from "./qr";
@@ -26,11 +26,25 @@ const DEFAULT_SETTINGS: SellerSettings = {
 let client: Client | null = null;
 let initialized = false;
 
+function writableDir(dir: string): boolean {
+  try {
+    mkdirSync(dir, { recursive: true });
+    const probe = path.join(dir, ".write-probe");
+    writeFileSync(probe, "ok");
+    unlinkSync(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function dbUrl(): string {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
-  const dir = path.join(process.cwd(), "data");
-  mkdirSync(dir, { recursive: true });
-  return `file:${path.join(dir, "flatqr.db")}`;
+  const candidates = [path.join(process.cwd(), "data"), "/tmp/flatqr-data"];
+  for (const dir of candidates) {
+    if (writableDir(dir)) return `file:${path.join(dir, "flatqr.db")}`;
+  }
+  return "file:/tmp/flatqr.db";
 }
 
 export function getDb(): Client {

@@ -3,15 +3,31 @@ import type { NextRequest } from "next/server";
 
 const SESSION_COOKIE = "flatqr_session";
 
+/** Public origin as the browser sees it (TLS-terminated proxy). */
+function publicOrigin(request: NextRequest): URL {
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const host = forwardedHost || request.headers.get("host") || request.nextUrl.host;
+  const proto =
+    forwardedProto ||
+    (request.nextUrl.protocol === "https:" ? "https" : "http");
+  return new URL(`${proto}://${host}`);
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/health" || pathname.startsWith("/health/")) {
+    return NextResponse.next();
+  }
+
   const authed = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
 
   if (pathname.startsWith("/app") && !authed) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
+    const target = publicOrigin(request);
+    target.pathname = "/";
+    target.searchParams.set("next", pathname);
+    return NextResponse.redirect(target);
   }
 
   if (pathname.startsWith("/api") && !pathname.startsWith("/api/auth/login")) {
@@ -24,5 +40,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*", "/api/:path*"],
+  matcher: ["/health", "/app/:path*", "/api/:path*"],
 };
