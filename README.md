@@ -61,21 +61,20 @@ Vor dem Versand an Kunden: IBAN unter *Einstellungen* ersetzen und das PDF mit e
 
 Kein Magic-Link-Mailer, kein Polar-Entitlement. `BETA_ACCESS` (Default `flatqr-beta`) plus E-Mail setzt ein Session-Cookie. Polar Agency Flat / Solo bleibt Stub.
 
+Marketing (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch.surge.sh).
+
 ## Deploy (Budget 0)
 
 Kernpfad braucht keine bezahlten APIs. Speicher ist lokal SQLite.
 
-| Host | Hinweis |
-| --- | --- |
-| **Fly.io / Render** | Persistente Disk auf `data/`. Kostenloser Rahmen reicht für Beta. |
-| **Turso + Vercel** | `DATABASE_URL=libsql://…` und `TURSO_AUTH_TOKEN`. Vercel-Dateisystem ist flüchtig — lokales SQLite dort nicht nutzen. |
-| **Cloudflare** | D1 wäre ein späterer Adapter, nicht in v1. |
+**Render Free** (`render.yaml`): Web Service, Plan *Free*, Frankfurt. Set `BETA_ACCESS=flatqr-beta`.  
+Free instances **cannot** attach a persistent disk — SQLite in `data/` is wiped when the service sleeps (15 min idle) or redeploys. Demo-CSV → QR-PDF still works after each cold start. For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
 
-`BETA_ACCESS` in den Host-Env-Vars setzen.
+**Fly.io:** `Dockerfile` is ready, but new Fly orgs only get a short unpaid trial (then a card). Do not use Fly if the rule is zero spend.
 
 ```bash
 npm run build
-npm start
+PORT=43127 npm start
 ```
 
 ## Tests

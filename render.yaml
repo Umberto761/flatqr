@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: flatqr
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: BETA_ACCESS
+        value: flatqr-beta
+      - key: NODE_ENV
+        value: production
