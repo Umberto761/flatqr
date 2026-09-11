@@ -67,8 +67,8 @@ Marketing-Seite (kein App-Login): [https://flatqr-ch.surge.sh](https://flatqr-ch
 
 Kernpfad braucht keine bezahlten APIs. Speicher ist lokal SQLite.
 
-**Render Free** (`render.yaml`): Web Service, Plan *Free*, Frankfurt. Set `BETA_ACCESS=flatqr-beta`.  
-Free instances **cannot** attach a persistent disk — SQLite in `data/` is wiped when the service sleeps (15 min idle) or redeploys. Demo-CSV → QR-PDF still works after each cold start. For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
+**Render Free** (`render.yaml`): Web Service, Plan *Free*, Frankfurt. `BETA_ACCESS=flatqr-beta` is already in the blueprint.  
+Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/flatqr). Free instances **cannot** attach a persistent disk — SQLite in `data/` is wiped when the service sleeps (15 min idle) or redeploys. Demo-CSV → QR-PDF still works after each cold start. For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
 
 **Fly.io:** `Dockerfile` is ready, but new Fly orgs only get a short unpaid trial (then a card). Do not use Fly if the rule is zero spend.
 
