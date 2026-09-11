@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useMemo, useState } from "react";
+import { createInvoiceAction } from "@/app/actions";
 import { EXPECTED_COLUMNS, type TimeEntry } from "@/lib/csv";
 import { addressForClient } from "@/lib/clients";
 import { formatCHF, formatHours } from "@/lib/money";
@@ -44,7 +44,10 @@ export function Werkstatt({
   initialEntries: TimeEntry[];
   settings: SettingsPayload;
 }) {
-  const router = useRouter();
+  const [invoiceState, invoiceAction, invoicePending] = useActionState(
+    createInvoiceAction,
+    null,
+  );
   const startingClients = uniqueClients(initialEntries);
   const startingClient = startingClients[0] ?? "";
   const startingAddress = addressForClient(startingClient);
@@ -141,41 +144,6 @@ export function Werkstatt({
     );
   }
 
-  async function createInvoice() {
-    setBusy(true);
-    setError(null);
-    try {
-      await fetch("/api/entries", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ entries }),
-      });
-      const response = await fetch("/api/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientName,
-          clientAddress,
-          clientBuilding,
-          clientZip,
-          clientCity,
-          clientCountry,
-          issueDate,
-          dueDate,
-          notes,
-          grouping,
-          entries: selected,
-        }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error ?? "Rechnung fehlgeschlagen.");
-      router.push(`/app/rechnungen/${payload.invoice.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Rechnung fehlgeschlagen.");
-      setBusy(false);
-    }
-  }
-
   return (
     <div className="space-y-5">
       <section className="grid gap-4 border border-[#c5c9d0] bg-white p-4 md:grid-cols-[1.3fr_1fr]">
@@ -240,10 +208,10 @@ export function Werkstatt({
         </Alert>
       ) : null}
 
-      {error ? (
+      {error || invoiceState?.error ? (
         <Alert variant="destructive">
           <AlertTitle>Fehler</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{error || invoiceState?.error}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -380,9 +348,34 @@ export function Werkstatt({
             </div>
           </section>
 
-          <section className="border border-[#c5c9d0] bg-white p-4 lg:sticky lg:top-4">
-            <h2 className="mb-3 text-base font-semibold">Rechnung an</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+          <form
+            action={invoiceAction}
+            className="border border-[#c5c9d0] bg-white p-4 lg:sticky lg:top-4"
+          >
+            <input type="hidden" name="entriesJson" value={JSON.stringify(selected)} />
+            <h2 className="text-base font-semibold">Rechnung an</h2>
+            <button
+              type="submit"
+              disabled={invoicePending || selected.length === 0 || !clientName.trim()}
+              className="mt-3 h-11 w-full bg-black text-sm font-medium text-white disabled:opacity-50"
+            >
+              {invoicePending ? "Erzeuge…" : "QR-Rechnung erstellen"}
+            </button>
+            <dl className="ledger mt-3 space-y-1 border-b border-[#e6e8ec] pb-3 text-sm">
+              <div className="flex justify-between">
+                <dt>Netto</dt>
+                <dd>{formatCHF(preview.net)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>MwSt</dt>
+                <dd>{formatCHF(preview.vat)}</dd>
+              </div>
+              <div className="flex justify-between font-semibold">
+                <dt>Total</dt>
+                <dd>{formatCHF(preview.gross)}</dd>
+              </div>
+            </dl>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <Field label="Kunde" name="clientName" value={clientName} onChange={setClientName} />
               <Field label="Land" name="clientCountry" value={clientCountry} onChange={setClientCountry} />
               <Field label="Strasse" name="clientAddress" value={clientAddress} onChange={setClientAddress} />
@@ -405,6 +398,7 @@ export function Werkstatt({
             <label className="mt-3 block space-y-1.5 text-sm">
               <span className="font-medium">Positionen</span>
               <select
+                name="grouping"
                 value={grouping}
                 onChange={(e) => setGrouping(e.target.value as "task" | "entry")}
                 className="h-11 w-full border border-[#c5c9d0] bg-white px-3 text-sm"
@@ -413,29 +407,7 @@ export function Werkstatt({
                 <option value="entry">Jede Zeile einzeln</option>
               </select>
             </label>
-            <dl className="ledger mt-4 space-y-1 text-sm">
-              <div className="flex justify-between">
-                <dt>Netto</dt>
-                <dd>{formatCHF(preview.net)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>MwSt</dt>
-                <dd>{formatCHF(preview.vat)}</dd>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <dt>Total</dt>
-                <dd>{formatCHF(preview.gross)}</dd>
-              </div>
-            </dl>
-            <button
-              type="button"
-              disabled={busy || selected.length === 0 || !clientName.trim()}
-              className="mt-4 h-11 w-full bg-black text-sm font-medium text-white disabled:opacity-50"
-              onClick={() => void createInvoice()}
-            >
-              {busy ? "Erzeuge…" : "QR-Rechnung erstellen"}
-            </button>
-          </section>
+          </form>
         </div>
       )}
     </div>
