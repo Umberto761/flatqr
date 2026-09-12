@@ -39,7 +39,10 @@ function writableDir(dir: string): boolean {
 }
 
 function dbUrl(): string {
-  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  // Use LIBSQL_URL (not DATABASE_URL): SnapDeploy ProjectAnalyzer treats
+  // process.env.DATABASE_URL as "requires PostgreSQL add-on" and blocks Free.
+  const remote = process.env.LIBSQL_URL?.trim();
+  if (remote) return remote;
   const candidates = [path.join(process.cwd(), "data"), "/tmp/flatqr-data"];
   for (const dir of candidates) {
     if (writableDir(dir)) return `file:${path.join(dir, "flatqr.db")}`;

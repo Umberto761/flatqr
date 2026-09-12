@@ -87,7 +87,7 @@ Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/
 | Start | `npm start` → `node scripts/start.cjs` (standalone `server.js` if present) |
 | Bind | `0.0.0.0` and `process.env.PORT` (default **8080** in containers; local `next dev` stays 43127) |
 | Health | `GET /health` → `200 ok` (no auth, no DB). `GET /` is the login page and must not redirect. |
-| Env | **`BETA_ACCESS=flatqr-beta`** (required), `NODE_ENV=production`. Optional: `HOSTNAME=0.0.0.0` if the platform does not set it. |
+| Env | **`BETA_ACCESS=flatqr-beta`** (required), `NODE_ENV=production`. Optional: `HOSTNAME=0.0.0.0`. Leave DB unset for on-disk SQLite; optional `LIBSQL_URL` (+ `TURSO_AUTH_TOKEN`) for Turso. Never set `DATABASE_URL` on SnapDeploy Free. |
 
 Set the SnapDeploy health path to `/health`. Free SnapDeploy Small allows at most 2 Dockerfile `FROM` stages (this repo uses builder + slim runner). Free accounts also cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
 
@@ -97,7 +97,8 @@ Set the SnapDeploy health path to `/health`. Free SnapDeploy Small allows at mos
 
 **Fly.io:** short unpaid trial, then a card. Do not use Fly if the rule is zero spend.
 
-For durable drafts, point `DATABASE_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
+For durable drafts, point `LIBSQL_URL` + `TURSO_AUTH_TOKEN` at a free Turso DB.
+Do **not** set `DATABASE_URL`: SnapDeploy’s ProjectAnalyzer maps that name to a PostgreSQL add-on and blocks Free Small when no add-on is linked.
 
 ```bash
 npm run build
