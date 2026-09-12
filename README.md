@@ -89,7 +89,7 @@ Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/
 | Health | `GET /health` → `200 ok` (no auth, no DB). `GET /` is the login page and must not redirect. |
 | Env | **`BETA_ACCESS=flatqr-beta`** (required), `NODE_ENV=production`. Optional: `HOSTNAME=0.0.0.0` if the platform does not set it. |
 
-Set the SnapDeploy health path to `/health`. Free SnapDeploy accounts cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
+Set the SnapDeploy health path to `/health`. Free SnapDeploy Small allows at most 2 Dockerfile `FROM` stages (this repo uses builder + slim runner). Free accounts also cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
 
 **Hugging Face Spaces (Docker):** `sdk: docker`, `app_port: 8080`. New accounts now require PRO for Docker Spaces.
 
