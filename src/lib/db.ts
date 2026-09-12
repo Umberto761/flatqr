@@ -39,8 +39,8 @@ function writableDir(dir: string): boolean {
 }
 
 function dbUrl(): string {
-  // Use LIBSQL_URL (not DATABASE_URL): SnapDeploy ProjectAnalyzer treats
-  // process.env.DATABASE_URL as "requires PostgreSQL add-on" and blocks Free.
+  // Optional remote libSQL/Turso URL. Avoid the conventional DB URL env name:
+  // SnapDeploy Free maps that name to a paid Postgres add-on requirement.
   const remote = process.env.LIBSQL_URL?.trim();
   if (remote) return remote;
   const candidates = [path.join(process.cwd(), "data"), "/tmp/flatqr-data"];
