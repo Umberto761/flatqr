@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CommonJS boot scripts (must require() to patch http before Next loads).
+    "scripts/**/*.cjs",
   ]),
 ]);
 

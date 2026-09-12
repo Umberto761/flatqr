@@ -85,11 +85,12 @@ Public source: [gitlab.com/flatqr-group/flatqr](https://gitlab.com/flatqr-group/
 | --- | --- |
 | Build | `npm ci && npm run build` (or the repo `Dockerfile`) |
 | Start | `npm start` → `node scripts/start.cjs` (standalone `server.js` if present) |
-| Bind | `0.0.0.0` and `process.env.PORT` (default **8080** in containers; local `next dev` stays 43127) |
-| Health | `GET /health` → `200 ok` (no auth, no DB). `GET /` is the login page and must not redirect. |
+| Bind | `0.0.0.0` and `process.env.PORT` (default **8080** in the Dockerfile; local `next dev` stays 43127) |
+| **SnapDeploy port** | Set the SnapDeploy **container / app port to 8080** so it matches `PORT`. The process listens on `process.env.PORT` (8080 unless you inject another value). If the UI is left at **3000**, set env `PORT=3000` — a 3000/8080 mismatch keeps the container CREATING/unhealthy. |
+| Health | `GET /health` → `200 ok` (text/plain). Answered in the Node process **before** Next.js, so it cannot 308 behind Cloudflare. No auth, no beta gate, no DB. Also `HEAD /health`. `GET /` is the login page and must not redirect. |
 | Env | **`BETA_ACCESS=flatqr-beta`** (required), `NODE_ENV=production`. Optional: `HOSTNAME=0.0.0.0`. Leave DB unset for on-disk SQLite; optional `LIBSQL_URL` (+ `TURSO_AUTH_TOKEN`) for Turso. Never set `DATABASE_URL` on SnapDeploy Free. |
 
-Set the SnapDeploy health path to `/health`. Free SnapDeploy Small allows at most 2 Dockerfile `FROM` stages (this repo uses builder + slim runner). Free accounts also cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
+Set the SnapDeploy health path to `/health` and the container port to **8080**. Free SnapDeploy Small allows at most 2 Dockerfile `FROM` stages (this repo uses builder + slim runner). Free accounts also cap deploys (e.g. 5/12h) — wait out the quota before a redeploy. SQLite in `data/` (or `/tmp/flatqr-data` if `data/` is not writable) is wiped when the container sleeps or restarts.
 
 **Hugging Face Spaces (Docker):** `sdk: docker`, `app_port: 8080`. New accounts now require PRO for Docker Spaces.
 

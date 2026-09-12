@@ -3,8 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["pdfkit", "swissqrbill", "@libsql/client"],
-  // Avoid / ↔ / trailing-slash bounces behind SnapDeploy / other TLS proxies.
+  // Behind SnapDeploy/Cloudflare, Next's slash + proxy URL normalize 308s
+  // /health (and sometimes /) to the same HTTPS URL. Disable both.
   skipTrailingSlashRedirect: true,
+  skipProxyUrlNormalize: true,
   experimental: {
     serverActions: {
       allowedOrigins: [
