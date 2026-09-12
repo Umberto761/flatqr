@@ -39,7 +39,10 @@ function writableDir(dir: string): boolean {
 }
 
 function dbUrl(): string {
-  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  // Optional remote libSQL/Turso URL. Avoid the conventional DB URL env name:
+  // SnapDeploy Free maps that name to a paid Postgres add-on requirement.
+  const remote = process.env.LIBSQL_URL?.trim();
+  if (remote) return remote;
   const candidates = [path.join(process.cwd(), "data"), "/tmp/flatqr-data"];
   for (const dir of candidates) {
     if (writableDir(dir)) return `file:${path.join(dir, "flatqr.db")}`;
